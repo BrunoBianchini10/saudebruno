@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plano completo — Bruno Vichi Bianchini</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; padding: 24px 16px; max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+  h2 { font-size: 15px; font-weight: 500; margin: 0 0 12px; }
+  .sub { font-size: 13px; color: #666; margin-bottom: 16px; }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .nav a { font-size: 13px; padding: 6px 14px; border-radius: 20px; background: #fff; border: 0.5px solid rgba(0,0,0,0.12); color: #1a1a1a; text-decoration: none; cursor: pointer; }
+  .nav a.active, .nav a:hover { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .sec-label { font-size: 11px; font-weight: 500; color: #999; letter-spacing: .06em; text-transform: uppercase; margin: 0 0 10px; }
+  .card { background: #fff; border: 0.5px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 0 20px; margin-bottom: 16px; }
+  .meal-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid rgba(0,0,0,0.07); }
+  .meal-row:last-child { border-bottom: none; }
+  .time-col { min-width: 54px; }
+  .time-main { font-size: 13px; font-weight: 500; }
+  .time-label { font-size: 11px; color: #999; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .meal-body { flex: 1; }
+  .meal-name { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+  .meal-desc { font-size: 12px; color: #555; line-height: 1.6; }
+  .meal-note { font-size: 11px; color: #999; margin-top: 3px; line-height: 1.5; }
+  .pills { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+  .pill { font-size: 11px; padding: 1px 8px; border-radius: 20px; }
+  .pill-p { background: #E6F1FB; color: #0C447C; }
+  .pill-c { background: #FAEEDA; color: #633806; }
+  .pill-g { background: #EAF3DE; color: #3B6D11; }
+  .pill-k { background: #F1EFE8; color: #444; }
+  .pill-orange { background: #FAECE7; color: #712B13; }
+  .pill-purple { background: #EEEDFE; color: #3C3489; }
+  .kcal-col { font-size: 12px; color: #999; min-width: 60px; text-align: right; padding-top: 3px; }
+  .totals { background: #f5f5f0; border-radius: 8px; padding: 14px 16px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+  .total-item { text-align: center; }
+  .total-label { font-size: 11px; color: #888; margin-bottom: 2px; }
+  .total-val { font-size: 17px; font-weight: 500; }
+  .note { border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.7; margin-bottom: 10px; }
+  .note strong { display: block; margin-bottom: 4px; }
+  .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .day-card { background: #fff; border: 0.5px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: border-color .15s; }
+  .day-card:hover { border-color: rgba(0,0,0,0.25); }
+  .day-card.rest { opacity: .65; }
+  .day-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .day-badge { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+  .day-title { font-size: 13px; font-weight: 500; }
+  .day-sub { font-size: 11px; color: #999; margin-top: 1px; }
+  .exercise-list { list-style: none; }
+  .exercise-list li { font-size: 12px; color: #555; padding: 3px 0; border-bottom: 0.5px solid rgba(0,0,0,0.05); line-height: 1.5; }
+  .exercise-list li:last-child { border-bottom: none; }
+  .exercise-list li::before { content: "·"; margin-right: 5px; color: #bbb; }
+  .phase-row { background: #fff; border: 0.5px solid rgba(0,0,0,0.1); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+  .phase-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+  .phase-body { flex: 1; }
+  .phase-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+  .phase-desc { font-size: 12px; color: #555; line-height: 1.6; }
+  .supp-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 9px 0; border-bottom: 0.5px solid rgba(0,0,0,0.07); gap: 12px; }
+  .supp-row:last-child { border-bottom: none; }
+  .supp-name { font-size: 13px; font-weight: 500; min-width: 160px; }
+  .supp-detail { font-size: 12px; color: #555; line-height: 1.5; flex: 1; }
+  .supp-timing { font-size: 11px; color: #999; min-width: 80px; text-align: right; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .metric-box { background: #fff; border: 0.5px solid rgba(0,0,0,0.1); border-radius: 10px; padding: 12px 14px; }
+  .metric-label { font-size: 11px; color: #888; margin-bottom: 3px; }
+  .metric-val { font-size: 18px; font-weight: 500; }
+  .metric-note { font-size: 11px; color: #999; margin-top: 2px; }
+</style>
+</head>
+<body>
+<h1>Plano completo — Bruno Vichi Bianchini</h1>
+<p class="sub">Objetivo: 10% de gordura · rotina: acorda 4:30h · treino 6:00h · atualizado mai/2026</p>
+
+<nav class="nav">
+  <a href="#" class="active" onclick="showSection('dieta',this);return false;">Dieta</a>
+  <a href="#" onclick="showSection('treino',this);return false;">Treino</a>
+  <a href="#" onclick="showSection('suplementos',this);return false;">Suplementação</a>
+  <a href="#" onclick="showSection('metas',this);return false;">Metas</a>
+</nav>
+
+<div id="dieta" class="section active">
+<p class="sec-label">Cronograma alimentar</p>
+<div class="card">
+  <div class="meal-row">
+    <div class="time-col"><p class="time-main">04:30</p><p class="time-label">Acordar</p></div>
+    <div class="dot" style="background:#378ADD;"></div>
+    <div class="meal-body">
+      <p class="meal-name">Pré-treino — leve e rápido</p>
+      <p class="meal-desc">1 banana média + 1 col. sopa de pasta de amendoim ou 5 biscoitos de arroz + café preto sem açúcar</p>
+      <p class="meal-note">Se sentir desconforto gástrico, substitua por só banana + café. Alternativa: whey 20 g + água 5 min antes do treino.</p>
+      <div class="pills"><span class="pill pill-p">5 g prot</span><span class="pill pill-c">32 g carbo</span><span class="pill pill-k">~180 kcal</span></div>
+    </div>
+    <div class="kcal-col">~180 kcal</div>
+  </div>
+  <div class="meal-row">
+    <div class="time-col"><p class="time-main">05:20</p><p class="time-label">Caminhada</p></div>
+    <div class="dot" style="background:#1D9E75;"></div>
+    <div class="meal-body">
+      <p class="meal-name">Caminhada / cardio leve</p>
+      <p class="meal-desc">40 min até 6h. Água + eletrólitos (pitada de sal + limão) se suar muito.</p>
+    </div>
+    <div class="kcal-col">—</div>
+  </div>
+  <div class="meal-row">
+    <div class="time-col"><p class="time-main">06:00</p><p class="time-label">Treino</p></div>
+    <div class="dot" style="background:#534AB7;"></div>
+    <div class="meal-body">
+      <p class="meal-name">Musculação</p>
+      <p class="meal-desc">Intraworkout: água + 5 g de creatina. Se treino longo (+60 min), 1 banana a meio treino.</p>
+    </div>
+    <div class="kcal-col">—</div>
+  </div>
+  <div class="meal-row">
+    <div class="time-col"><p class="time-main">07:30</p><p class="time-label">Pós-treino</p></div>
+    <div class="dot" style="background:#D85A30;"></div>
+    <div class="meal-body">
+      <p class="meal-name">Refeição pós-treino — principal do dia</p>
+      <p class="meal-desc">Whey isolado 30 g + 3–4 ovos mexidos + 2 fatias de pão integral ou 150 g batata doce + 1 fruta</p>
+      <p class="meal-note">Janela anabólica mais importante. Não pular mesmo sem fome — a tirzepatida vai suprimir, mas coma assim mesmo.</p>
+      <div class="pills"><span class="pill pill-p">55 g prot</span><span class="pill pill-c">60 g carbo</span><span class="pill pill-g">12 g gord</span><span class="pill pill-k">~580 kcal</span></div>
+    </div>
+    <div class="kcal-col">~580 kcal</div>
+  </div>
+  <div class="meal-row">
+    <div class="time-col"><p class="time-main">10:30</p><p class="time-label">Lanche</p></div>
+    <div class="dot" style="background:#378ADD;"></div>
+    <div class="meal-body">
+      <p class="meal-name">Lanche proteico</p>
+      <p class="meal-desc">200 g iogurte grego proteico (sem açúcar) + 30 g granola low sugar ou 15 g de nozes/amêndoas</p>
+      <div class="pills"><span class="pill pill-p">25 g prot</span><span class="pill pill-c">20 g carbo</span><span class="pill pill-g">8 g gord</span><span class="pill pill-k">~250 kcal</span></div>
+    </div>
+    <div class="kcal-col">~250 kcal</div>
+  </div>
+  <div class="meal-row">
+    <div class="time-col"><p class="time-main">13:00</p><p class="time-label">Almoço</p></div>
+    <div class="dot" style="background:#1D9E75;"></div>
+    <div class="meal-body">
+      <p class="meal-name">Almoço</p>
+      <p class="meal-desc">180–200 g frango/tilápia/patinho + 120 g arroz integral ou batata doce + salada verde à vontade + 1 col. sopa de azeite</p>
+      <div class="pills"><span class="pill pill-p">50 g prot</span><span class="pill pill-c">40 g carbo</span><span class="pill pill-g">14 g gord</span><span class="pill pill-k">~500 kcal</span></div>
+    </div>
+    <div class="kcal-col">~500 kcal</div>
+  </div>
+  <div class="meal-row">
+    <div class="time-col"><p class="time-main">16:30</p><p class="time-label">Lanche</p></div>
+    <div class="dot" style="background:#BA7517;"></div>
+    <div class="meal-body">
+      <p class="meal-name">Lanche da tarde</p>
+      <p class="meal-desc">150 g de cottage ou 2 ovos cozidos + 1 fruta pequena (kiwi, pera, maçã)</p>
+      <div class="pills"><span class="pill pill-p">28 g prot</span><span class="pill pill-c">18 g carbo</span><span class="pill pill-g">5 g gord</span><span class="pill pill-k">~230 kcal</span></div>
+    </div>
+    <div class="kcal-col">~230 kcal</div>
+  </div>
+  <div class="meal-row">
+    <div class="time-col"><p class="time-main">19:30</p><p class="time-label">Jantar</p></div>
+    <div class="dot" style="background:#534AB7;"></div>
+    <div class="meal-body">
+      <p class="meal-name">Jantar — baixo em carboidrato</p>
+      <p class="meal-desc">180 g de peixe (salmão, tilápia, sardinha) ou frango + legumes refogados no azeite (abobrinha, brócolis, espinafre) + 80 g mandioca ou 1 batata média</p>
+      <p class="meal-note">Noite: reduzir carboidrato, manter proteína alta. Auxilia recomposição durante o sono.</p>
+      <div class="pills"><span class="pill pill-p">45 g prot</span><span class="pill pill-c">22 g carbo</span><span class="pill pill-g">14 g gord</span><span class="pill pill-k">~400 kcal</span></div>
+    </div>
+    <div class="kcal-col">~400 kcal</div>
+  </div>
+  <div class="meal-row">
+    <div class="time-col"><p class="time-main">21:00</p><p class="time-label">Ceia</p></div>
+    <div class="dot" style="background:#888;"></div>
+    <div class="meal-body">
+      <p class="meal-name">Ceia noturna — recomendada</p>
+      <p class="meal-desc">150–200 g de cottage ou caseína em pó — proteína de digestão lenta que alimenta o músculo durante o sono.</p>
+      <p class="meal-note">Você acorda às 4:30h — sem ceia são ~7,5h de jejum até o pós-treino. A ceia protege a massa muscular nesse intervalo.</p>
+      <div class="pills"><span class="pill pill-p">25 g prot</span><span class="pill pill-c">6 g carbo</span><span class="pill pill-k">~150 kcal</span></div>
+    </div>
+    <div class="kcal-col">~150 kcal</div>
+  </div>
+</div>
+
+<div class="totals">
+  <div class="total-item"><p class="total-label">Total calorias</p><p class="total-val">~2.290 kcal</p></div>
+  <div class="total-item"><p class="total-label">Proteína</p><p class="total-val">233 g</p></div>
+  <div class="total-item"><p class="total-label">Carboidrato</p><p class="total-val">198 g</p></div>
+  <div class="total-item"><p class="total-label">Gordura</p><p class="total-val">53 g</p></div>
+  <div class="total-item"><p class="total-label">Refeições</p><p class="total-val">7</p></div>
+</div>
+
+<div class="note" style="background:#E6F1FB; color:#0C447C;">
+  <strong>Sobre treinar em jejum parcial às 6h</strong>
+  Com banana + pasta de amendoim às 4:30h você tem substrato disponível. Se a tirzepatida causar desconforto e não conseguir comer, use só café preto + whey 20 g imediatamente antes do treino — funciona bem sem pesar no estômago.
+</div>
+
+<div class="note" style="background:#FAEEDA; color:#633806;">
+  <strong>Quando retornar à corrida (dia sim/dia não)</strong>
+  Nos dias de corrida: mantenha o pré-treino às 4:30h antes da corrida, o cronograma segue igual. Nos dias sem corrida (só musculação): pode reduzir o carboidrato do pré-treino e compensar no almoço.
+</div>
+
+<div class="note" style="background:#E1F5EE; color:#085041;">
+  <strong>Hidratação — importante com espironolactona</strong>
+  Mínimo 3 L de água/dia. A espironolactona aumenta a excreção renal — risco de desequilíbrio de sódio/potássio se a hidratação estiver baixa. Água de coco (1 unidade/dia) é uma boa fonte natural de potássio no contexto do déficit calórico.
+</div>
+</div>
+
+<div id="treino" class="section">
+<p class="sec-label">Fase atual — semanas 1–4 (retomada pós-hérnia)</p>
+<div class="note" style="background:#FAEEDA; color:#633806; margin-bottom:16px;">
+  <strong>Atenção — pós-operatório de hérnia inguinal</strong>
+  Retorno há 15 dias. Carga 60–70%, técnica rigorosa, volume moderado. Sem exercícios com alta pressão intra-abdominal (agachamento livre pesado, leg press com amplitude total, desenvolvimento com barra). Liberação médica necessária antes de avançar para a fase 2.
+</div>
+
+<p class="sec-label" style="margin-top:0;">Semana padrão</p>
+<div class="day-grid">
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-badge" style="background:#E6F1FB; color:#0C447C;">SEG</div>
+      <div><p class="day-title">Peito + Tríceps</p><p class="day-sub">Empurrar horizontal</p></div>
+    </div>
+    <ul class="exercise-list">
+      <li>Supino inclinado halteres — 4×12</li>
+      <li>Crossover cabo — 3×15</li>
+      <li>Voador peitoral — 3×15</li>
+      <li>Tríceps polia alta — 4×12</li>
+      <li>Mergulho assistido — 3×12</li>
+    </ul>
+    <div class="pills" style="margin-top:8px;"><span class="pill pill-k">~60 min</span><span class="pill pill-c">65–70% carga</span></div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-badge" style="background:#E1F5EE; color:#085041;">TER</div>
+      <div><p class="day-title">Costas + Bíceps</p><p class="day-sub">Puxar vertical/horizontal</p></div>
+    </div>
+    <ul class="exercise-list">
+      <li>Puxada frente supinada — 4×12</li>
+      <li>Remada sentada cabo — 4×12</li>
+      <li>Remada unilateral haltere — 3×12</li>
+      <li>Rosca direta barra — 3×12</li>
+      <li>Rosca alternada halteres — 3×12</li>
+    </ul>
+    <div class="pills" style="margin-top:8px;"><span class="pill pill-k">~60 min</span><span class="pill pill-c">65–70% carga</span></div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-badge" style="background:#FAEEDA; color:#633806;">QUA</div>
+      <div><p class="day-title">Pernas</p><p class="day-sub">Sem pressão abdominal</p></div>
+    </div>
+    <ul class="exercise-list">
+      <li>Leg press 45° — amplitude parcial, pé alto — 4×15</li>
+      <li>Cadeira extensora — 4×15</li>
+      <li>Mesa flexora — 4×15</li>
+      <li>Abdução de quadril máquina — 3×15</li>
+      <li>Panturrilha sentado — 4×20</li>
+    </ul>
+    <div class="pills" style="margin-top:8px;"><span class="pill pill-k">~55 min</span><span class="pill pill-orange">sem agachamento livre</span></div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-badge" style="background:#EEEDFE; color:#3C3489;">QUI</div>
+      <div><p class="day-title">Ombros + Cardio</p><p class="day-sub">Empurrar vertical + aeróbico</p></div>
+    </div>
+    <ul class="exercise-list">
+      <li>Desenvolvimento halteres sentado — 4×12</li>
+      <li>Elevação lateral halteres — 4×15</li>
+      <li>Elevação frontal alternada — 3×12</li>
+      <li>Face pull cabo — 3×15</li>
+      <li>Caminhada inclinada 5–8% — 20 min</li>
+    </ul>
+    <div class="pills" style="margin-top:8px;"><span class="pill pill-k">~65 min</span><span class="pill pill-c">65–70% carga</span></div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-badge" style="background:#E6F1FB; color:#0C447C;">SEX</div>
+      <div><p class="day-title">Full body + HIIT</p><p class="day-sub">Circuito + intervalado</p></div>
+    </div>
+    <ul class="exercise-list">
+      <li>Circuit training 40 min — compostos com halteres</li>
+      <li>HIIT bike ou elíptico — 15 min</li>
+      <li>30 seg esforço / 90 seg ativo</li>
+      <li>Sem impacto direto no abdômen</li>
+    </ul>
+    <div class="pills" style="margin-top:8px;"><span class="pill pill-k">~55 min</span><span class="pill pill-purple">intensidade moderada</span></div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-badge" style="background:#EAF3DE; color:#3B6D11;">SÁB</div>
+      <div><p class="day-title">Cardio + Mobilidade</p><p class="day-sub">Aeróbico + alongamento</p></div>
+    </div>
+    <ul class="exercise-list">
+      <li>Caminhada rápida, bike ou esteira — 40–50 min</li>
+      <li>65–70% da FC máxima</li>
+      <li>Mobilidade de quadril — 15 min</li>
+      <li>Alongamento global — 10 min</li>
+    </ul>
+    <div class="pills" style="margin-top:8px;"><span class="pill pill-k">~65 min</span><span class="pill pill-g">baixa intensidade</span></div>
+  </div>
+
+  <div class="day-card rest">
+    <div class="day-header">
+      <div class="day-badge" style="background:#F1EFE8; color:#5F5E5A;">DOM</div>
+      <div><p class="day-title">Descanso ativo</p><p class="day-sub">Recuperação</p></div>
+    </div>
+    <ul class="exercise-list">
+      <li>Caminhada leve 20–30 min</li>
+      <li>Sono de qualidade — prioridade</li>
+      <li>Hidratação e alimentação em dia</li>
+    </ul>
+    <div class="pills" style="margin-top:8px;"><span class="pill pill-k">descanso</span></div>
+  </div>
+</div>
+
+<p class="sec-label">Progressão de fases</p>
+<div class="phase-row">
+  <div class="phase-num" style="background:#FAEEDA; color:#633806;">1</div>
+  <div class="phase-body">
+    <p class="phase-title">Semanas 1–4 — retomada (agora)</p>
+    <p class="phase-desc">Reconstrução neuromuscular. Carga 60–70%, volume moderado. Sem compostos pesados. Cardio leve a moderado. Foco em técnica e confiança pós-cirurgia.</p>
+  </div>
+</div>
+<div class="phase-row">
+  <div class="phase-num" style="background:#E6F1FB; color:#0C447C;">2</div>
+  <div class="phase-body">
+    <p class="phase-title">Semanas 5–10 — progressão</p>
+    <p class="phase-desc">Introduzir agachamento e levantamentos compostos (com liberação médica). Aumentar HIIT para 3×/semana. Carga 75–80%. Retomada gradual da corrida.</p>
+  </div>
+</div>
+<div class="phase-row">
+  <div class="phase-num" style="background:#E1F5EE; color:#085041;">3</div>
+  <div class="phase-body">
+    <p class="phase-title">Semanas 11–20 — intensidade máxima</p>
+    <p class="phase-desc">Treino split avançado, carga 80–90%. Cardio estratégico (corrida + HIIT). Ajuste calórico conforme bioimpedância mensal. Fase final para atingir 10% de gordura.</p>
+  </div>
+</div>
+
+<div class="note" style="background:#E6F1FB; color:#0C447C; margin-top:16px;">
+  <strong>Quando retornar à corrida</strong>
+  A corrida deve ser reintroduzida gradualmente a partir da fase 2 — com aval do cirurgião. Comece com corrida leve de 20 min no lugar da caminhada dos dias alternados, avançando progressivamente. Nunca corrida no mesmo dia de treino pesado de pernas nas primeiras semanas.
+</div>
+</div>
+
+<div id="suplementos" class="section">
+<p class="sec-label">Protocolo atual</p>
+<div class="card" style="padding: 0 20px;">
+  <div class="supp-row">
+    <span class="supp-name">Creatina monoidratada</span>
+    <span class="supp-detail">5 g/dia. Essencial para preservar força e massa durante o déficit calórico. Manter independente da fase.</span>
+    <span class="supp-timing">Intraworkout</span>
+  </div>
+  <div class="supp-row">
+    <span class="supp-name">Espironolactona</span>
+    <span class="supp-detail">Conforme prescrição médica. Monitorar potássio, sódio e magnésio nos exames — o diurético depleta eletrólitos.</span>
+    <span class="supp-timing">Prescrição</span>
+  </div>
+  <div class="supp-row">
+    <span class="supp-name">Whey isolado</span>
+    <span class="supp-detail">2 doses × 30 g/dia — pré-treino (5:55h) e pós-treino (7:30h). Indispensável com tirzepatida suprimindo o apetite.</span>
+    <span class="supp-timing">Pré + pós treino</span>
+  </div>
+</div>
+
+<p class="sec-label" style="margin-top:16px;">Recomendações — aguardar exames para confirmar doses</p>
+<div class="card" style="padding: 0 20px;">
+  <div class="supp-row">
+    <span class="supp-name">Vitamina D3 + K2</span>
+    <span class="supp-detail">Provável deficiência. Dose provável: D3 5.000 UI + K2 100 mcg. Confirmar com 25-OH vitamina D.</span>
+    <span class="supp-timing">Com almoço</span>
+  </div>
+  <div class="supp-row">
+    <span class="supp-name">Magnésio quelado</span>
+    <span class="supp-detail">300–400 mg à noite. Melhora sono, recuperação muscular e compensa depleção pela espironolactona.</span>
+    <span class="supp-timing">21:00h</span>
+  </div>
+  <div class="supp-row">
+    <span class="supp-name">Ômega-3 (EPA+DHA)</span>
+    <span class="supp-detail">2–3 g/dia de EPA+DHA. Anti-inflamatório, proteção cardiovascular, auxilia recomposição corporal.</span>
+    <span class="supp-timing">Com almoço</span>
+  </div>
+  <div class="supp-row">
+    <span class="supp-name">Zinco quelado</span>
+    <span class="supp-detail">15–30 mg/dia. Importante para testosterona endógena — avaliar após exame hormonal (testosterona + LH + FSH).</span>
+    <span class="supp-timing">Com jantar</span>
+  </div>
+  <div class="supp-row">
+    <span class="supp-name">Vitamina B12</span>
+    <span class="supp-detail">Verificar nos exames — deficiência comum, causa fadiga e piora recuperação muscular.</span>
+    <span class="supp-timing">Com café manhã</span>
+  </div>
+</div>
+
+<div class="note" style="background:#FCEBEB; color:#791F1F; margin-top:16px;">
+  <strong>Eixo hormonal — pós-ciclo</strong>
+  Com histórico de durateston, masteron e oxandrolona, o eixo hipotálamo-hipófise-testículo pode estar suprimido. LH e FSH baixos com testosterona baixa nos exames indicam necessidade de conversa com seu médico sobre TPC (tamoxifeno/clomifeno) ou TRT. Isso impacta diretamente a capacidade de recuperação muscular e bem-estar geral.
+</div>
+</div>
+
+<div id="metas" class="section">
+<p class="sec-label">Situação atual vs meta</p>
+<div class="metric-grid">
+  <div class="metric-box">
+    <p class="metric-label">Peso atual</p>
+    <p class="metric-val">88,9 kg</p>
+    <p class="metric-note">mai/2026</p>
+  </div>
+  <div class="metric-box">
+    <p class="metric-label">Peso alvo</p>
+    <p class="metric-val">82–83 kg</p>
+    <p class="metric-note">−6 a 7 kg de gordura</p>
+  </div>
+  <div class="metric-box">
+    <p class="metric-label">% gordura atual</p>
+    <p class="metric-val">17,4%</p>
+    <p class="metric-note">15,5 kg de gordura</p>
+  </div>
+  <div class="metric-box">
+    <p class="metric-label">% gordura alvo</p>
+    <p class="metric-val">10%</p>
+    <p class="metric-note">−7,4 pontos percentuais</p>
+  </div>
+  <div class="metric-box">
+    <p class="metric-label">Músculo atual</p>
+    <p class="metric-val">69,4 kg</p>
+    <p class="metric-note">manter ou recuperar</p>
+  </div>
+  <div class="metric-box">
+    <p class="metric-label">Calorias/dia</p>
+    <p class="metric-val">2.290 kcal</p>
+    <p class="metric-note">déficit ~350 kcal</p>
+  </div>
+  <div class="metric-box">
+    <p class="metric-label">Proteína/dia</p>
+    <p class="metric-val">233 g</p>
+    <p class="metric-note">2,5 g/kg massa magra</p>
+  </div>
+  <div class="metric-box">
+    <p class="metric-label">Prazo estimado</p>
+    <p class="metric-val">4–5 meses</p>
+    <p class="metric-note">set–out 2026</p>
+  </div>
+</div>
+
+<p class="sec-label">Ritmo de perda recomendado</p>
+<div class="note" style="background:#E1F5EE; color:#085041; margin-bottom:10px;">
+  <strong>0,3 kg/semana — 1,0 a 1,2 kg/mês</strong>
+  Ritmo que preserva massa muscular com déficit calórico moderado. Se a balança cair mais de 1,5 kg/semana por 2 semanas seguidas, aumentar calorias em 150–200 kcal (preferencialmente proteína e carboidrato).
+</div>
+
+<p class="sec-label" style="margin-top:16px;">Checkpoints de bioimpedância</p>
+<div class="card" style="padding: 0 20px;">
+  <div class="supp-row">
+    <span class="supp-name">Junho 2026</span>
+    <span class="supp-detail">Primeira reavaliação — confirmar que a massa muscular está sendo preservada após retomada completa dos treinos.</span>
+  </div>
+  <div class="supp-row">
+    <span class="supp-name">Julho 2026</span>
+    <span class="supp-detail">Fase 2 em andamento — avaliar resposta à progressão de carga e ajustar calorias conforme composição.</span>
+  </div>
+  <div class="supp-row">
+    <span class="supp-name">Setembro 2026</span>
+    <span class="supp-detail">Fase 3 — deveria estar em torno de 12–13% de gordura. Ajuste fino para a reta final até 10%.</span>
+  </div>
+  <div class="supp-row">
+    <span class="supp-name">Outubro 2026</span>
+    <span class="supp-detail">Meta — 10% de gordura com massa muscular preservada ou superior à atual.</span>
+  </div>
+</div>
+</div>
+
+<script>
+function showSection(id, el) {
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.nav a').forEach(function(a){ a.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
