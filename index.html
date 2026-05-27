@@ -90,6 +90,18 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
 .metric-label { font-size: 11px; color: #888; margin-bottom: 3px; }
 .metric-val { font-size: 18px; font-weight: 500; }
 .metric-note { font-size: 11px; color: #999; margin-top: 2px; }
+
+/* Rastreamento de exercícios */
+.exercise-list li.trackable { display:flex; align-items:center; gap:7px; }
+.exercise-list li.trackable::before { display:none; }
+.ex-check { width:14px; height:14px; border-radius:3px; flex-shrink:0; cursor:pointer; accent-color:#1a1a1a; }
+.exercise-list li.done { color:#bbb; text-decoration:line-through; }
+.day-header { position:relative; }
+.day-progress { font-size:10px; color:#aaa; margin-left:auto; white-space:nowrap; }
+.day-progress.all-done { color:#3B6D11; font-weight:500; }
+.day-card.all-done { border-color:rgba(59,109,17,0.35); }
+.day-clear { font-size:10px; color:#ccc; background:none; border:none; cursor:pointer; padding:0 0 0 6px; line-height:1; }
+.day-clear:hover { color:#999; }
 </style>
 </head>
 <body>
@@ -846,6 +858,78 @@ document.querySelectorAll('.nav a').forEach(function(a, i) {
   a.setAttribute('data-tab', tabs[i]);
   a.onclick = function(){ showSection(this, tabs[i]); return false; };
 });
+
+function todayKey() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function updateDayProgress(card, planId, dayIdx) {
+  var items = card.querySelectorAll('.exercise-list .ex-check');
+  var total = items.length;
+  if (!total) return;
+  var done = 0;
+  items.forEach(function(cb){ if (cb.checked) done++; });
+  var span = card.querySelector('.day-progress');
+  if (span) {
+    span.textContent = done + '/' + total + ' feitos';
+    span.classList.toggle('all-done', done === total);
+  }
+  card.classList.toggle('all-done', done === total);
+}
+
+function initExerciseTracking() {
+  var today = todayKey();
+  ['conservador', 'acelerado'].forEach(function(plan) {
+    var section = document.getElementById(plan + '-treino');
+    if (!section) return;
+    var cards = section.querySelectorAll('.day-card');
+    cards.forEach(function(card, di) {
+      var header = card.querySelector('.day-header');
+      if (header) {
+        var progressSpan = document.createElement('span');
+        progressSpan.className = 'day-progress';
+        var clearBtn = document.createElement('button');
+        clearBtn.className = 'day-clear';
+        clearBtn.title = 'Limpar dia';
+        clearBtn.textContent = '×';
+        clearBtn.addEventListener('click', function() {
+          var cbs = card.querySelectorAll('.ex-check');
+          cbs.forEach(function(cb, ei) {
+            var key = 'ex_' + plan + '_' + di + '_' + ei + '_' + today;
+            localStorage.removeItem(key);
+            cb.checked = false;
+            cb.closest('li').classList.remove('done');
+          });
+          updateDayProgress(card, plan, di);
+        });
+        header.appendChild(progressSpan);
+        header.appendChild(clearBtn);
+      }
+
+      var items = card.querySelectorAll('.exercise-list li');
+      items.forEach(function(li, ei) {
+        li.classList.add('trackable');
+        var key = 'ex_' + plan + '_' + di + '_' + ei + '_' + today;
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'ex-check';
+        cb.checked = localStorage.getItem(key) === '1';
+        if (cb.checked) li.classList.add('done');
+        cb.addEventListener('change', function() {
+          localStorage.setItem(key, cb.checked ? '1' : '0');
+          li.classList.toggle('done', cb.checked);
+          updateDayProgress(card, plan, di);
+        });
+        li.insertBefore(cb, li.firstChild);
+      });
+
+      updateDayProgress(card, plan, di);
+    });
+  });
+}
+
+initExerciseTracking();
 </script>
 </body>
 </html>
