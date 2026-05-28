@@ -102,6 +102,30 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
 .day-card.all-done { border-color:rgba(59,109,17,0.35); }
 .day-clear { font-size:10px; color:#ccc; background:none; border:none; cursor:pointer; padding:0 0 0 6px; line-height:1; }
 .day-clear:hover { color:#999; }
+
+/* Timer de descanso */
+.rest-btn { font-size:10px; color:#aaa; background:#f5f5f0; border:none; border-radius:20px; padding:2px 7px; cursor:pointer; white-space:nowrap; flex-shrink:0; margin-left:auto; }
+.rest-btn:hover { background:#e8e8e3; color:#555; }
+.rest-btn.running { background:#FAEEDA; color:#633806; font-weight:500; }
+.rest-btn.done { background:#EAF3DE; color:#3B6D11; }
+
+/* Botão de info */
+.info-btn { font-size:11px; color:#ccc; background:none; border:none; cursor:pointer; padding:2px 3px; flex-shrink:0; line-height:1; }
+.info-btn:hover { color:#888; }
+
+/* Modal de detalhes */
+.ex-modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:100; }
+.ex-modal-backdrop.open { display:flex; align-items:flex-end; justify-content:center; }
+.ex-modal { background:#fff; border-radius:16px 16px 0 0; padding:20px 20px 32px; width:100%; max-width:760px; max-height:80vh; overflow-y:auto; }
+.ex-modal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+.ex-modal-title { font-size:15px; font-weight:500; flex:1; padding-right:12px; line-height:1.4; }
+.ex-modal-close { background:none; border:none; font-size:22px; color:#aaa; cursor:pointer; line-height:1; flex-shrink:0; }
+.ex-modal-row { display:flex; gap:10px; margin-bottom:9px; }
+.ex-modal-label { font-size:11px; color:#888; min-width:76px; padding-top:1px; }
+.ex-modal-val { font-size:12px; color:#1a1a1a; flex:1; line-height:1.5; }
+.ex-modal-tip { background:#F1EFE8; border-radius:8px; padding:10px 12px; font-size:12px; color:#555; line-height:1.6; margin:12px 0 0; }
+.ex-modal-video { display:block; text-align:center; background:#1a1a1a; color:#fff; border-radius:10px; padding:11px; font-size:13px; text-decoration:none; margin-top:14px; }
+.ex-modal-video:hover { background:#333; }
 </style>
 </head>
 <body>
@@ -878,8 +902,104 @@ function updateDayProgress(card, planId, dayIdx) {
   card.classList.toggle('all-done', done === total);
 }
 
+var exerciseDB = {
+  'Supino inclinado halteres':        { muscles:'Peito superior · Tríceps · Ombro anterior', kcal:'~5–6 kcal/série', rest:90,  tip:'Cotovelos a ~45° do tronco. Desça controlado (2s), suba explosivo.' },
+  'Crossover cabo':                   { muscles:'Peito · Ombro anterior', kcal:'~3–4 kcal/série', rest:60, tip:'Leve flexão nos cotovelos. Contraia o peito no cruzamento das mãos.' },
+  'Voador peitoral':                  { muscles:'Peito (médio) · Ombro anterior', kcal:'~3 kcal/série', rest:60, tip:'Amplitude controlada, não force além do conforto no ombro. Foco na contração.' },
+  'Tríceps polia alta':               { muscles:'Tríceps (cabeça lateral)', kcal:'~3 kcal/série', rest:60, tip:'Cotovelos fixos ao lado do corpo. Extensão completa, sem balançar o tronco.' },
+  'Mergulho assistido':               { muscles:'Tríceps · Peito inferior · Ombro', kcal:'~4 kcal/série', rest:60, tip:'Pós-cirurgia: use carga assistida leve. Evite descida além de 90° no cotovelo.' },
+  'Puxada frente supinada':           { muscles:'Latíssimo do dorso · Bíceps · Romboides', kcal:'~5 kcal/série', rest:90, tip:'Pegada supinada recruta mais bíceps. Puxe até o queixo, escápulas juntas no fim.' },
+  'Remada sentada cabo':              { muscles:'Dorso médio · Romboides · Trapézio', kcal:'~4–5 kcal/série', rest:90, tip:'Retração escapular antes de puxar. Sem flexão excessiva de tronco.' },
+  'Remada unilateral haltere':        { muscles:'Dorso (unilateral) · Bíceps', kcal:'~4 kcal/série', rest:60, tip:'Apoie joelho e mão no banco. Cotovelo paralelo ao corpo na subida.' },
+  'Rosca direta barra':               { muscles:'Bíceps braquial · Braquial', kcal:'~3 kcal/série', rest:60, tip:'Cotovelos fixos, sem balançar o quadril. Pausa de 1s no topo.' },
+  'Rosca alternada halteres':         { muscles:'Bíceps (unilateral) · Supinador', kcal:'~3 kcal/série', rest:60, tip:'Gire o antebraço ao subir (supinação). Mantenha o cotovelo preso ao tronco.' },
+  'Rosca direta':                     { muscles:'Bíceps braquial · Braquial', kcal:'~3 kcal/série', rest:60, tip:'Cotovelos fixos, sem balançar o quadril. Pausa de 1s no topo.' },
+  'Leg press 45°':                    { muscles:'Quadríceps · Glúteos · Isquiotibiais', kcal:'~6–7 kcal/série', rest:90, tip:'Pós-cirurgia: amplitude parcial (30–60°). Pés na largura do quadril, joelhos alinhados.' },
+  'Cadeira extensora':                { muscles:'Quadríceps (isolado)', kcal:'~3–4 kcal/série', rest:60, tip:'Pausa de 1s no topo. Não trave o joelho. Sem peso excessivo pós-cirurgia.' },
+  'Mesa flexora':                     { muscles:'Isquiotibiais (isolado)', kcal:'~3–4 kcal/série', rest:60, tip:'Quadril neutro no banco. Não eleve o quadril ao subir o peso.' },
+  'Abdução quadril máquina':          { muscles:'Glúteo médio · Glúteo mínimo · TFL', kcal:'~2–3 kcal/série', rest:60, tip:'Movimento lento e controlado. Pausa na abertura máxima. Sem balanço.' },
+  'Panturrilha sentado':              { muscles:'Sóleo (panturrilha profunda)', kcal:'~2 kcal/série', rest:45, tip:'Amplitude completa: calcanhar abaixo da plataforma no início, ponta do pé no fim.' },
+  'Desenvolvimento halteres sentado': { muscles:'Deltóide anterior e medial · Tríceps', kcal:'~4–5 kcal/série', rest:90, tip:'Não empurre atrás da cabeça. Pare com o cotovelo a 90° na descida.' },
+  'Elevação lateral halteres':        { muscles:'Deltóide medial (isolado)', kcal:'~3 kcal/série', rest:60, tip:'Leve inclinação para frente. Cotovelo ligeiramente fletido. Não ultrapasse a altura do ombro.' },
+  'Elevação frontal alternada':       { muscles:'Deltóide anterior · Ombro', kcal:'~3 kcal/série', rest:60, tip:'Alternado reduz fadiga. Polegar levemente para cima. Sem embalo do tronco.' },
+  'Face pull cabo':                   { muscles:'Deltóide posterior · Manguito rotador · Trapézio', kcal:'~2–3 kcal/série', rest:60, tip:'Corda puxada até a testa, cotovelos para fora e acima. Ótimo para saúde do ombro.' },
+  'Caminhada inclinada':              { muscles:'Glúteos · Isquiotibiais · Cardiovascular', kcal:'~6–8 kcal/min', rest:0,  tip:'Inclinação 5–8%. Cadência constante. Não segure o corrimão — exige mais do core.' },
+  'Circuit training':                 { muscles:'Full body (compostos)', kcal:'~8–10 kcal/min', rest:0,  tip:'Transições rápidas entre exercícios. Mantenha técnica mesmo com cansaço.' },
+  'HIIT bike':                        { muscles:'Cardiovascular · Membros inferiores', kcal:'~10–12 kcal/min', rest:0, tip:'30s máximo / 90s ativo. Frequência cardíaca: 85–95% no pico.' },
+  'HIIT':                             { muscles:'Cardiovascular · Full body', kcal:'~10–12 kcal/min', rest:0, tip:'Intervalo de alta intensidade. Recuperação ativa entre os picos.' },
+  'Caminhada':                        { muscles:'Cardiovascular · Membros inferiores', kcal:'~5–6 kcal/min', rest:0,  tip:'Passo cadenciado. Braços em movimento. Hidrate-se a cada 15–20 min.' },
+  'Mobilidade de quadril':            { muscles:'Quadril · Iliopsoas · Glúteos', kcal:'~2 kcal/min', rest:0,  tip:'Movimentos lentos e contínuos. Sem dor — apenas sensação de alongamento.' },
+  'Alongamento global':               { muscles:'Full body', kcal:'~1–2 kcal/min', rest:0,  tip:'Mínimo 30s por posição. Respire profundamente. Não force além do limite de hoje.' },
+};
+
+function getExerciseKey(text) {
+  var name = text.split(' — ')[0].trim();
+  if (exerciseDB[name]) return name;
+  var keys = Object.keys(exerciseDB);
+  for (var i = 0; i < keys.length; i++) {
+    if (name.toLowerCase().startsWith(keys[i].toLowerCase()) ||
+        keys[i].toLowerCase().startsWith(name.toLowerCase())) return keys[i];
+  }
+  return null;
+}
+
+function buildModal() {
+  var backdrop = document.createElement('div');
+  backdrop.className = 'ex-modal-backdrop';
+  backdrop.innerHTML =
+    '<div class="ex-modal">' +
+      '<div class="ex-modal-header"><span class="ex-modal-title"></span><button class="ex-modal-close">×</button></div>' +
+      '<div class="ex-modal-row"><span class="ex-modal-label">Músculos</span><span class="ex-modal-val" id="em-muscles"></span></div>' +
+      '<div class="ex-modal-row"><span class="ex-modal-label">Estimativa</span><span class="ex-modal-val" id="em-kcal"></span></div>' +
+      '<div class="ex-modal-row"><span class="ex-modal-label">Descanso</span><span class="ex-modal-val" id="em-rest"></span></div>' +
+      '<div class="ex-modal-tip" id="em-tip"></div>' +
+      '<a class="ex-modal-video" id="em-video" href="#" target="_blank" rel="noopener">▶ Ver como executar no YouTube</a>' +
+    '</div>';
+  backdrop.querySelector('.ex-modal-close').onclick = function() { backdrop.classList.remove('open'); };
+  backdrop.onclick = function(e) { if (e.target === backdrop) backdrop.classList.remove('open'); };
+  document.body.appendChild(backdrop);
+  return backdrop;
+}
+
+function showExerciseDetail(key, modal) {
+  var d = exerciseDB[key];
+  modal.querySelector('.ex-modal-title').textContent = key;
+  modal.querySelector('#em-muscles').textContent = d.muscles;
+  modal.querySelector('#em-kcal').textContent = d.kcal;
+  modal.querySelector('#em-rest').textContent = d.rest > 0 ? d.rest + 's entre séries' : 'Contínuo — sem pausa entre séries';
+  modal.querySelector('#em-tip').textContent = '💡 ' + d.tip;
+  var q = encodeURIComponent('como fazer ' + key);
+  modal.querySelector('#em-video').href = 'https://www.youtube.com/results?search_query=' + q;
+  modal.classList.add('open');
+}
+
+var timers = {};
+
+function startRestTimer(btn, seconds) {
+  var id = btn.dataset.timerId;
+  if (timers[id]) {
+    clearInterval(timers[id]); delete timers[id];
+    btn.textContent = '⏱ ' + seconds + 's'; btn.className = 'rest-btn';
+    return;
+  }
+  var remaining = seconds;
+  btn.classList.add('running');
+  timers[id] = setInterval(function() {
+    remaining--;
+    var m = Math.floor(remaining / 60), s = remaining % 60;
+    btn.textContent = m + ':' + String(s).padStart(2, '0');
+    if (remaining <= 0) {
+      clearInterval(timers[id]); delete timers[id];
+      btn.textContent = '✓ vai!'; btn.className = 'rest-btn done';
+      setTimeout(function() { btn.textContent = '⏱ ' + seconds + 's'; btn.className = 'rest-btn'; }, 3000);
+    }
+  }, 1000);
+}
+
 function initExerciseTracking() {
   var today = todayKey();
+  var modal = buildModal();
+
   ['conservador', 'acelerado'].forEach(function(plan) {
     var section = document.getElementById(plan + '-treino');
     if (!section) return;
@@ -922,6 +1042,33 @@ function initExerciseTracking() {
           updateDayProgress(card, plan, di);
         });
         li.insertBefore(cb, li.firstChild);
+
+        var rawText = li.textContent.trim();
+        var exKey = getExerciseKey(rawText);
+        var exData = exKey ? exerciseDB[exKey] : null;
+
+        if (exData && exData.rest > 0) {
+          var timerId = plan + '_' + di + '_' + ei;
+          var restBtn = document.createElement('button');
+          restBtn.className = 'rest-btn';
+          restBtn.textContent = '⏱ ' + exData.rest + 's';
+          restBtn.dataset.timerId = timerId;
+          (function(btn, secs) {
+            btn.addEventListener('click', function() { startRestTimer(btn, secs); });
+          })(restBtn, exData.rest);
+          li.appendChild(restBtn);
+        }
+
+        if (exData) {
+          var infoBtn = document.createElement('button');
+          infoBtn.className = 'info-btn';
+          infoBtn.textContent = 'ℹ';
+          infoBtn.title = 'Ver detalhes';
+          (function(k) {
+            infoBtn.addEventListener('click', function() { showExerciseDetail(k, modal); });
+          })(exKey);
+          li.appendChild(infoBtn);
+        }
       });
 
       updateDayProgress(card, plan, di);
