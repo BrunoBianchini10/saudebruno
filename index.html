@@ -109,6 +109,15 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
 .rest-btn.running { background:#FAEEDA; color:#633806; font-weight:500; }
 .rest-btn.done { background:#EAF3DE; color:#3B6D11; }
 
+/* Overlay "VAI!" */
+.go-overlay { display:none; position:fixed; inset:0; background:#1D9E75; z-index:999; align-items:center; justify-content:center; flex-direction:column; }
+.go-overlay.active { display:flex; animation: goExplode .25s cubic-bezier(.17,.67,.35,1.4) forwards; }
+.go-overlay.fade-out { animation: goFade .5s ease forwards; }
+.go-overlay-text { font-size:clamp(72px,20vw,160px); font-weight:700; color:#fff; letter-spacing:-.02em; line-height:1; }
+.go-overlay-sub { font-size:clamp(14px,4vw,22px); color:rgba(255,255,255,.75); margin-top:12px; letter-spacing:.1em; text-transform:uppercase; }
+@keyframes goExplode { from { transform:scale(.25); opacity:0; } to { transform:scale(1); opacity:1; } }
+@keyframes goFade    { from { opacity:1; } to { opacity:0; } }
+
 /* Botão de info */
 .info-btn { font-size:11px; color:#ccc; background:none; border:none; cursor:pointer; padding:2px 3px; flex-shrink:0; line-height:1; }
 .info-btn:hover { color:#888; }
@@ -890,6 +899,11 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
 
 </div><!-- fim #acelerado -->
 
+<div id="go-overlay" class="go-overlay">
+  <div class="go-overlay-text">VAI!</div>
+  <div class="go-overlay-sub">Descansou — agora é hora</div>
+</div>
+
 <script>
 var currentPlan = 'conservador';
 var currentTab = 'dieta';
@@ -1036,6 +1050,16 @@ function showExerciseDetail(key, modal) {
 
 var timers = {};
 
+function fireGoOverlay() {
+  var el = document.getElementById('go-overlay');
+  el.classList.remove('fade-out');
+  el.classList.add('active');
+  setTimeout(function() {
+    el.classList.add('fade-out');
+    setTimeout(function() { el.classList.remove('active','fade-out'); }, 500);
+  }, 1800);
+}
+
 function startRestTimer(btn, seconds) {
   var id = btn.dataset.timerId;
   if (timers[id]) {
@@ -1052,6 +1076,7 @@ function startRestTimer(btn, seconds) {
     if (remaining <= 0) {
       clearInterval(timers[id]); delete timers[id];
       btn.textContent = '✓ vai!'; btn.className = 'rest-btn done';
+      fireGoOverlay();
       setTimeout(function() { btn.textContent = '⏱ ' + seconds + 's'; btn.className = 'rest-btn'; }, 3000);
     }
   }, 1000);
