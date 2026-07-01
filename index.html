@@ -436,9 +436,9 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
         <div class="pills" style="margin-top:8px;"><span class="pill pill-k">~70 min</span><span class="pill pill-orange">HIIT fase 2</span></div>
       </div>
       <div class="day-card">
-        <div class="day-header"><div class="day-badge" style="background:#E6F1FB; color:#0C447C;">SEX</div><div><p class="day-title">Full body + HIIT</p><p class="day-sub">Circuito + intervalado</p></div></div>
+        <div class="day-header"><div class="day-badge" style="background:#E6F1FB; color:#0C447C;">SEX</div><div><p class="day-title">Braços + HIIT</p><p class="day-sub">Bíceps · Tríceps isolados</p></div></div>
         <ul class="exercise-list">
-          <li>Circuit training 40 min — compostos halteres</li><li>HIIT bike ou elíptico — 20–25 min</li><li>30 seg esforço / 90 seg ativo</li>
+          <li>Rosca direta barra — 3×12</li><li>Rosca alternada halteres — 3×12</li><li>Rosca martelo halteres — 3×12</li><li>Tríceps testa haltere — 3×12</li><li>Tríceps corda polia — 3×15</li><li>HIIT bike ou elíptico — 20 min</li><li>30 seg esforço / 90 seg ativo</li>
         </ul>
         <div class="pills" style="margin-top:8px;"><span class="pill pill-k">~65 min</span><span class="pill pill-purple">intensidade moderada-alta</span></div>
       </div>
@@ -807,8 +807,8 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
         <div class="pills" style="margin-top:8px;"><span class="pill pill-k">~70 min</span><span class="pill pill-orange">HIIT ativo</span></div>
       </div>
       <div class="day-card">
-        <div class="day-header"><div class="day-badge" style="background:#E6F1FB; color:#0C447C;">SEX</div><div><p class="day-title">Full body + HIIT</p><p class="day-sub">3ª sessão HIIT fase 2</p></div></div>
-        <ul class="exercise-list"><li>Circuit training 40 min — compostos halteres</li><li>HIIT bike ou elíptico — 25 min</li><li>30 seg esforço / 90 seg ativo</li></ul>
+        <div class="day-header"><div class="day-badge" style="background:#E6F1FB; color:#0C447C;">SEX</div><div><p class="day-title">Braços + HIIT</p><p class="day-sub">Bíceps · Tríceps isolados</p></div></div>
+        <ul class="exercise-list"><li>Rosca direta barra — 3×12</li><li>Rosca alternada halteres — 3×12</li><li>Rosca martelo halteres — 3×12</li><li>Tríceps testa haltere — 3×12</li><li>Tríceps corda polia — 3×15</li><li>HIIT bike ou elíptico — 25 min</li><li>30 seg esforço / 90 seg ativo</li></ul>
         <div class="pills" style="margin-top:8px;"><span class="pill pill-k">~70 min</span><span class="pill pill-red">HIIT toda semana</span><span class="pill pill-purple">intensidade moderada-alta</span></div>
       </div>
       <div class="day-card">
@@ -1007,6 +1007,9 @@ var exerciseDB = {
   'Alongamento global':               { muscles:'Full body', kcal:'~1–2 kcal/min', rest:0,  tip:'Mínimo 30s por posição. Respire profundamente. Não force além do limite de hoje.' },
   'Agachamento goblet haltere':       { muscles:'Quadríceps · Glúteos · Core · Eretores', kcal:'~6–7 kcal/série', rest:90, tip:'Segure o haltere com as duas mãos à frente do peito. Desça controlado, joelhos acompanhando os pés. Respire normalmente — sem prender o ar.' },
   'Corrida leve':                     { muscles:'Cardiovascular · Membros inferiores', kcal:'~8–10 kcal/min', rest:0, tip:'70–75% FC máxima — ritmo conversacional. Pós-hérnia: sem inclinação acentuada nas primeiras semanas. Parar se sentir desconforto inguinal.' },
+  'Rosca martelo halteres':           { muscles:'Bíceps braquial · Braquioradial · Bíceps curto', kcal:'~3 kcal/série', rest:60, tip:'Pegada neutra (polegar para cima), sem girar o antebraço. Cotovelo fixo ao tronco. Contraia no topo e desça controlado.' },
+  'Tríceps testa':                    { muscles:'Tríceps (cabeça longa)', kcal:'~3 kcal/série', rest:60, tip:'Haltere ou barra. Cotovelos apontados para o teto, fixos. Desça até próximo à testa, suba sem travar o cotovelo no topo.' },
+  'Tríceps corda polia':              { muscles:'Tríceps (todas as cabeças · ênfase lateral)', kcal:'~3 kcal/série', rest:60, tip:'Separe a corda na extensão final para ativar mais a cabeça lateral. Cotovelos fixos ao lado do corpo durante todo o movimento.' },
 };
 
 function getExerciseKey(text) {
